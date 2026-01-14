@@ -382,3 +382,74 @@ textarea{ resize: vertical; }
   .shell{ grid-template-columns: 1fr; }
   .grid2{ grid-template-columns: 1fr; }
 }
+
+/* Due status badges */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-left:10px;
+  padding:3px 10px;
+  border-radius:999px;
+  font-family: var(--font-mono);
+  font-size:12px;
+  line-height:16px;
+  border: 1px solid var(--stroke);
+  background: rgba(244,221,205,0.55);
+}
+
+/* Light mode badge tones (palette-based) */
+.badge--overdue{
+  border-color: rgba(89,37,11,0.35);
+  background: rgba(89,37,11,0.12);
+  color: var(--coffee);
+  font-weight:600;
+}
+.badge--due-now{
+  border-color: rgba(128,70,27,0.35);
+  background: rgba(128,70,27,0.12);
+  color: var(--brown);
+  font-weight:600;
+}
+.badge--due-today{
+  border-color: rgba(155,118,83,0.35);
+  background: rgba(155,118,83,0.12);
+  color: var(--tan);
+  font-weight:600;
+}
+.badge--due-soon{
+  border-color: rgba(189,171,117,0.45);
+  background: rgba(189,171,117,0.16);
+  color: var(--ink);
+  font-weight:600;
+}
+
+/* Row emphasis for due items */
+.todoRow.due-overdue{ box-shadow: 0 0 0 2px rgba(89,37,11,0.18) inset; }
+.todoRow.due-due-now{ box-shadow: 0 0 0 2px rgba(128,70,27,0.16) inset; }
+.todoRow.due-due-today{ box-shadow: 0 0 0 2px rgba(155,118,83,0.16) inset; }
+.todoRow.due-due-soon{ box-shadow: 0 0 0 2px rgba(189,171,117,0.18) inset; }
+
+/* Dark mode: keep badges readable */
+:root[data-theme="dark"] .badge{
+  background: rgba(244,221,205,0.10);
+  border-color: rgba(244,221,205,0.22);
+  color: var(--text);
+}
+:root[data-theme="dark"] .badge--overdue{
+  background: rgba(244,221,205,0.14);
+  border-color: rgba(244,221,205,0.35);
+  color: #F4DDCD;
+}
+:root[data-theme="dark"] .badge--due-now{
+  background: rgba(189,171,117,0.14);
+  border-color: rgba(189,171,117,0.34);
+}
+:root[data-theme="dark"] .badge--due-today{
+  background: rgba(155,118,83,0.14);
+  border-color: rgba(155,118,83,0.34);
+}
+:root[data-theme="dark"] .badge--due-soon{
+  background: rgba(244,221,205,0.10);
+  border-color: rgba(244,221,205,0.26);
+}

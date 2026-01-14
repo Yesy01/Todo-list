@@ -47,6 +47,7 @@ function render() {
   renderTodos(ui.todoList, selected);
 }
 
+setInterval(render, 60_000);
 applyTheme(getPreferredTheme());
 render();
 

@@ -1,4 +1,12 @@
-import { format, parseISO, isBefore, startOfToday } from "date-fns";
+import {
+  format,
+  parseISO,
+  isBefore,
+  isAfter,
+  differenceInMinutes,
+  startOfToday,
+  addDays,
+} from "date-fns";
 
 function safeDate(iso) {
   if (!iso) return null;
@@ -19,21 +27,56 @@ function formatDue(dueDateISO, dueTime) {
   return `${datePart} ${dueTime}`;
 }
 
-// Overdue rules:
-// - If date+time: overdue if now > due datetime
-// - If date only: overdue if date < today (not overdue during the day)
-function isOverdue(dueDateISO, dueTime) {
-  if (!dueDateISO) return false;
+function toDueDateTime(dueDateISO, dueTime) {
+  if (!dueDateISO) return null;
 
   if (dueTime) {
     const dt = new Date(`${dueDateISO}T${dueTime}`);
-    if (Number.isNaN(dt.getTime())) return false;
-    return Date.now() > dt.getTime();
+    if (Number.isNaN(dt.getTime())) return null;
+    return dt;
   }
 
-  const d = safeDate(dueDateISO);
-  if (!d) return false;
-  return isBefore(d, startOfToday());
+  // date-only: treat as end of day (23:59) so "due today" stays "due today"
+  const dt = new Date(`${dueDateISO}T23:59`);
+  if (Number.isNaN(dt.getTime())) return null;
+  return dt;
+}
+
+/**
+ * Status buckets:
+ * - none: no due date
+ * - overdue: now > due datetime
+ * - due-now: due within next 60 minutes
+ * - due-today: due later today
+ * - due-soon: due within next 3 days (excluding today)
+ * - future: later than 3 days
+ */
+function getDueStatus(dueDateISO, dueTime) {
+  const dt = toDueDateTime(dueDateISO, dueTime);
+  if (!dt) return { key: "none", label: null, minutesLeft: null };
+
+  const now = new Date();
+  const mins = differenceInMinutes(dt, now);
+
+  if (mins < 0) return { key: "overdue", label: "OVERDUE", minutesLeft: mins };
+
+  // due within 60 minutes
+  if (mins <= 60) return { key: "due-now", label: "DUE SOON", minutesLeft: mins };
+
+  // due today (date-only or date+time)
+  const todayStart = startOfToday();
+  const tomorrowStart = addDays(todayStart, 1);
+  if (isAfter(dt, todayStart) && isBefore(dt, tomorrowStart)) {
+    return { key: "due-today", label: "DUE TODAY", minutesLeft: mins };
+  }
+
+  // due within next 3 days (not today)
+  const in3Days = addDays(todayStart, 4); // today + 3 days window end
+  if (isBefore(dt, in3Days)) {
+    return { key: "due-soon", label: "DUE SOON", minutesLeft: mins };
+  }
+
+  return { key: "future", label: null, minutesLeft: mins };
 }
 
 export function renderTodos(el, project) {
@@ -51,7 +94,6 @@ export function renderTodos(el, project) {
     if (priorityRank[a.priority] !== priorityRank[b.priority])
       return priorityRank[a.priority] - priorityRank[b.priority];
 
-    // sort by date then time
     const aKey = `${a.dueDateISO || "9999-99-99"}T${a.dueTime || "23:59"}`;
     const bKey = `${b.dueDateISO || "9999-99-99"}T${b.dueTime || "23:59"}`;
     return aKey.localeCompare(bKey);
@@ -59,19 +101,28 @@ export function renderTodos(el, project) {
 
   sorted.forEach((t) => {
     const row = document.createElement("div");
-    row.className = `todoRow priority-${t.priority} ${t.completed ? "done" : ""}`;
-    row.dataset.todoId = t.id;
 
     const due = formatDue(t.dueDateISO, t.dueTime);
-    const overdue = !t.completed && isOverdue(t.dueDateISO, t.dueTime);
+    const status = !t.completed
+      ? getDueStatus(t.dueDateISO, t.dueTime)
+      : { key: "future", label: null };
+
+    row.className = `todoRow priority-${t.priority} ${t.completed ? "done" : ""} due-${status.key}`;
+    row.dataset.todoId = t.id;
+
+    const badgeHtml =
+      status.label ? `<span class="badge badge--${status.key}">${status.label}</span>` : "";
 
     row.innerHTML = `
       <div class="todoRow__left">
         <input type="checkbox" class="todoCheck" ${t.completed ? "checked" : ""} />
         <div>
-          <div class="todoTitle">${escapeHtml(t.title || "(untitled)")}</div>
-          <div class="todoMeta ${overdue ? "overdue" : ""}">
-            Due: ${escapeHtml(due)} • Priority: ${t.priority}${overdue ? " • OVERDUE" : ""}
+          <div class="todoTitle">
+            ${escapeHtml(t.title || "(untitled)")}
+            ${badgeHtml}
+          </div>
+          <div class="todoMeta">
+            Due: ${escapeHtml(due)} &bull; Priority: ${t.priority}
           </div>
         </div>
       </div>
