@@ -7,7 +7,7 @@ It supports **multiple projects**, full **CRUD** on todos, **due date + optional
 ---
 
 ## Live Demo
-- GitHub Pages: *(add your link after deployment)*
+- GitHub Pages: https://yesy01.github.io/Todo-list/
 
 ---
 
