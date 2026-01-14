@@ -4,7 +4,10 @@ export function mountLayout(root) {
       <aside class="sidebar">
         <div class="sidebar__top">
           <h1>Projects</h1>
-          <button class="btn" id="addProjectBtn">+ Project</button>
+          <div style="display:flex; gap:8px;">
+            <button class="btn tiny" id="themeToggleBtn">Theme</button>
+            <button class="btn" id="addProjectBtn">+ Project</button>
+          </div>
         </div>
         <ul class="projectList" id="projectList"></ul>
 
@@ -37,6 +40,7 @@ export function mountLayout(root) {
     currentProjectName: root.querySelector("#currentProjectName"),
     projectMeta: root.querySelector("#projectMeta"),
     addProjectBtn: root.querySelector("#addProjectBtn"),
+    themeToggleBtn: root.querySelector("#themeToggleBtn"),
     renameProjectBtn: root.querySelector("#renameProjectBtn"),
     deleteProjectBtn: root.querySelector("#deleteProjectBtn"),
     addTodoBtn: root.querySelector("#addTodoBtn"),

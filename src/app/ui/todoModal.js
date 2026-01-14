@@ -30,22 +30,27 @@ export function openTodoModal({ modal, backdrop }, { title, state, todo, onSave,
         </label>
 
         <label>
+          DUE TIME
+          <input name="dueTime" type="time" value="${escapeAttr(todo?.dueTime ?? "")}" />
+        </label>
+
+        <label>
           PRIORITY
           <select name="priority">
             ${PRIORITIES.map(p => `<option value="${p}" ${todo?.priority === p ? "selected" : ""}>${p}</option>`).join("")}
           </select>
         </label>
-      </div>
 
-      <label>
-        PROJECT
-        <select name="projectId">
-          ${projects.map(p => {
-            const selected = todo?.projectId ? (todo.projectId === p.id) : (state.selectedProjectId === p.id);
-            return `<option value="${p.id}" ${selected ? "selected" : ""}>${escapeHtml(p.name)}</option>`;
-          }).join("")}
-        </select>
-      </label>
+        <label>
+          PROJECT
+          <select name="projectId">
+            ${projects.map(p => {
+              const selected = todo?.projectId ? (todo.projectId === p.id) : (state.selectedProjectId === p.id);
+              return `<option value="${p.id}" ${selected ? "selected" : ""}>${escapeHtml(p.name)}</option>`;
+            }).join("")}
+          </select>
+        </label>
+      </div>
 
       <label>
         NOTES
@@ -89,6 +94,7 @@ export function openTodoModal({ modal, backdrop }, { title, state, todo, onSave,
       title: String(fd.get("title") || "").trim(),
       description: String(fd.get("description") || ""),
       dueDateISO: String(fd.get("dueDateISO") || ""),
+      dueTime: String(fd.get("dueTime") || ""),
       priority: String(fd.get("priority") || "medium"),
       notes: String(fd.get("notes") || ""),
       completed: fd.get("completed") === "on",

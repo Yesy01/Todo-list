@@ -7,6 +7,7 @@ export function makeTodo({
   title = "",
   description = "",
   dueDateISO = "",         // store as "YYYY-MM-DD"
+  dueTime = "",            // "HH:mm" (optional)
   priority = "medium",
   notes = "",
   checklist = [],
@@ -16,7 +17,7 @@ export function makeTodo({
 } = {}) {
   if (!PRIORITIES.includes(priority)) priority = "medium";
   return {
-    id, title, description, dueDateISO, priority, notes, checklist,
+    id, title, description, dueDateISO, dueTime, priority, notes, checklist,
     completed, createdAt, updatedAt,
   };
 }

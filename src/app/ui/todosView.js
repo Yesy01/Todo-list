@@ -1,15 +1,39 @@
 import { format, parseISO, isBefore, startOfToday } from "date-fns";
 
-function safeFormat(iso) {
-  if (!iso) return "No due date";
-  try { return format(parseISO(iso), "yyyy-MM-dd"); }
-  catch { return "Invalid date"; }
+function safeDate(iso) {
+  if (!iso) return null;
+  try {
+    return parseISO(iso);
+  } catch {
+    return null;
+  }
 }
 
-function isOverdue(iso) {
-  if (!iso) return false;
-  try { return isBefore(parseISO(iso), startOfToday()); }
-  catch { return false; }
+function formatDue(dueDateISO, dueTime) {
+  const d = safeDate(dueDateISO);
+  if (!d) return "No due date";
+
+  const datePart = format(d, "yyyy-MM-dd");
+  if (!dueTime) return datePart;
+
+  return `${datePart} ${dueTime}`;
+}
+
+// Overdue rules:
+// - If date+time: overdue if now > due datetime
+// - If date only: overdue if date < today (not overdue during the day)
+function isOverdue(dueDateISO, dueTime) {
+  if (!dueDateISO) return false;
+
+  if (dueTime) {
+    const dt = new Date(`${dueDateISO}T${dueTime}`);
+    if (Number.isNaN(dt.getTime())) return false;
+    return Date.now() > dt.getTime();
+  }
+
+  const d = safeDate(dueDateISO);
+  if (!d) return false;
+  return isBefore(d, startOfToday());
 }
 
 export function renderTodos(el, project) {
@@ -26,7 +50,11 @@ export function renderTodos(el, project) {
     if (a.completed !== b.completed) return a.completed ? 1 : -1;
     if (priorityRank[a.priority] !== priorityRank[b.priority])
       return priorityRank[a.priority] - priorityRank[b.priority];
-    return (a.dueDateISO || "9999-99-99").localeCompare(b.dueDateISO || "9999-99-99");
+
+    // sort by date then time
+    const aKey = `${a.dueDateISO || "9999-99-99"}T${a.dueTime || "23:59"}`;
+    const bKey = `${b.dueDateISO || "9999-99-99"}T${b.dueTime || "23:59"}`;
+    return aKey.localeCompare(bKey);
   });
 
   sorted.forEach((t) => {
@@ -34,8 +62,8 @@ export function renderTodos(el, project) {
     row.className = `todoRow priority-${t.priority} ${t.completed ? "done" : ""}`;
     row.dataset.todoId = t.id;
 
-    const due = safeFormat(t.dueDateISO);
-    const overdue = !t.completed && isOverdue(t.dueDateISO);
+    const due = formatDue(t.dueDateISO, t.dueTime);
+    const overdue = !t.completed && isOverdue(t.dueDateISO, t.dueTime);
 
     row.innerHTML = `
       <div class="todoRow__left">
@@ -43,7 +71,7 @@ export function renderTodos(el, project) {
         <div>
           <div class="todoTitle">${escapeHtml(t.title || "(untitled)")}</div>
           <div class="todoMeta ${overdue ? "overdue" : ""}">
-            Due: ${due} • Priority: ${t.priority}${overdue ? " • OVERDUE" : ""}
+            Due: ${escapeHtml(due)} • Priority: ${t.priority}${overdue ? " • OVERDUE" : ""}
           </div>
         </div>
       </div>

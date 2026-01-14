@@ -27,6 +27,49 @@
   --r: 18px;
 }
 
+/* Theme: default = light */
+:root[data-theme="light"]{
+  color-scheme: light;
+}
+
+/* Theme: dark (same palette, inverted roles) */
+:root[data-theme="dark"]{
+  color-scheme: dark;
+
+  --bg: #2B1F1A;        /* night */
+  --night: #F4DDCD;     /* text becomes light */
+  --card: rgba(50,36,30,0.72); /* ink-ish glass */
+  --stroke: rgba(244,221,205,0.16);
+  --shadow: 0 10px 30px rgba(0,0,0,0.35);
+
+  /* keep accents but tweak for contrast */
+  --p-low: #BDAB75;
+  --p-med: #9B7653;
+  --p-high: #F4DDCD;
+
+  /* button surfaces */
+}
+
+:root[data-theme="dark"] .btn{
+  background: rgba(50,36,30,0.75);
+  border-color: rgba(244,221,205,0.18);
+  color: var(--night);
+}
+
+:root[data-theme="dark"] .btn.primary{
+  background: #F4DDCD;
+  color: #2B1F1A;
+  border-color: rgba(244,221,205,0.35);
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] select{
+  background: rgba(43,31,26,0.6);
+  border-color: rgba(244,221,205,0.22);
+  color: var(--night);
+}
+
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
 body{

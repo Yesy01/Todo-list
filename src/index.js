@@ -10,6 +10,27 @@ const store = createStore();
 const root = document.getElementById("app");
 const ui = mountLayout(root);
 
+const THEME_KEY = "todo_theme_v1";
+
+function getPreferredTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === "light" || saved === "dark") return saved;
+
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem(THEME_KEY, theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.dataset.theme || "light";
+  applyTheme(current === "dark" ? "light" : "dark");
+}
+
 function findTodo(project, todoId) {
   return project.todos.find(t => t.id === todoId) || null;
 }
@@ -26,7 +47,10 @@ function render() {
   renderTodos(ui.todoList, selected);
 }
 
+applyTheme(getPreferredTheme());
 render();
+
+ui.themeToggleBtn.addEventListener("click", toggleTheme);
 
 /* Projects */
 ui.projectList.addEventListener("click", (e) => {
