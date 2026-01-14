@@ -32,42 +32,125 @@
   color-scheme: light;
 }
 
-/* Theme: dark (same palette, inverted roles) */
+/* Theme: dark (higher contrast, still on-brand) */
 :root[data-theme="dark"]{
   color-scheme: dark;
 
-  --bg: #2B1F1A;        /* night */
-  --night: #F4DDCD;     /* text becomes light */
-  --card: rgba(50,36,30,0.72); /* ink-ish glass */
-  --stroke: rgba(244,221,205,0.16);
-  --shadow: 0 10px 30px rgba(0,0,0,0.35);
+  /* BACKGROUND: very dark */
+  --bg: #1B1411;          /* deeper than #2B1F1A for contrast */
+  --night: #F4DDCD;       /* main text */
 
-  /* keep accents but tweak for contrast */
+  /* SURFACES: clearly lighter than bg */
+  --card: rgba(50,36,30,0.92);     /* solid-ish surface */
+  --card-2: rgba(68,49,40,0.92);   /* secondary surface */
+  --stroke: rgba(244,221,205,0.22);
+  --shadow: 0 18px 60px rgba(0,0,0,0.55);
+
+  /* PRIORITY ACCENTS: keep palette but make them pop */
   --p-low: #BDAB75;
   --p-med: #9B7653;
   --p-high: #F4DDCD;
 
-  /* button surfaces */
+  /* TEXT */
+  --text: #F4DDCD;
+  --text-2: rgba(244,221,205,0.78);
+  --text-3: rgba(244,221,205,0.62);
 }
 
-:root[data-theme="dark"] .btn{
-  background: rgba(50,36,30,0.75);
+/* Apply text variables in dark mode */
+:root[data-theme="dark"] body{
+  background:
+    radial-gradient(1200px 600px at 20% 0%, rgba(189,171,117,0.14), transparent),
+    radial-gradient(900px 600px at 80% 40%, rgba(155,118,83,0.10), transparent),
+    var(--bg);
+  color: var(--text);
+}
+
+/* Cards + panes */
+:root[data-theme="dark"] .sidebar,
+:root[data-theme="dark"] .main{
+  background: var(--card);
+  border-color: var(--stroke);
+  box-shadow: var(--shadow);
+}
+
+/* Project items: make active state obvious */
+:root[data-theme="dark"] .projectItem{
+  color: var(--text);
+}
+:root[data-theme="dark"] .projectItem:hover{
+  background: rgba(244,221,205,0.08);
+}
+:root[data-theme="dark"] .projectItem.active{
+  background: rgba(244,221,205,0.14);
+  border-color: rgba(244,221,205,0.32);
+}
+
+/* Todo rows: increase surface contrast */
+:root[data-theme="dark"] .todoRow{
+  background: var(--card-2);
   border-color: rgba(244,221,205,0.18);
-  color: var(--night);
+}
+:root[data-theme="dark"] .todoTitle{
+  color: var(--text);
+}
+:root[data-theme="dark"] .todoMeta{
+  color: var(--text-2);
+}
+:root[data-theme="dark"] .muted{
+  color: var(--text-3);
+}
+
+/* Buttons: readable + distinct */
+:root[data-theme="dark"] .btn{
+  background: rgba(244,221,205,0.08);
+  border-color: rgba(244,221,205,0.22);
+  color: var(--text);
+}
+:root[data-theme="dark"] .btn:hover{
+  background: rgba(244,221,205,0.12);
+  border-color: rgba(244,221,205,0.30);
 }
 
 :root[data-theme="dark"] .btn.primary{
   background: #F4DDCD;
-  color: #2B1F1A;
+  color: #1B1411;
   border-color: rgba(244,221,205,0.35);
 }
 
+:root[data-theme="dark"] .btn.danger{
+  background: rgba(189,171,117,0.12);
+  border-color: rgba(189,171,117,0.28);
+  color: #F4DDCD;
+}
+
+/* Inputs */
 :root[data-theme="dark"] input,
 :root[data-theme="dark"] textarea,
 :root[data-theme="dark"] select{
-  background: rgba(43,31,26,0.6);
+  background: rgba(244,221,205,0.06);
   border-color: rgba(244,221,205,0.22);
-  color: var(--night);
+  color: var(--text);
+}
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder{
+  color: rgba(244,221,205,0.45);
+}
+
+/* Modal: strong separation */
+:root[data-theme="dark"] .modal{
+  background: rgba(50,36,30,0.98);
+  border-color: rgba(244,221,205,0.24);
+}
+:root[data-theme="dark"] .modalBackdrop{
+  background: rgba(0,0,0,0.62);
+}
+
+/* Pill */
+:root[data-theme="dark"] .pill{
+  background: rgba(244,221,205,0.10);
+  border-color: rgba(244,221,205,0.22);
+  color: var(--text);
 }
 
 *{ box-sizing:border-box; }
@@ -222,7 +305,7 @@ h2{ font-size:32px; line-height:40px; }
 .todoRow__actions{ display:flex; gap:8px; align-items:center; }
 
 /* Priority indicator */
-.todoRow{ border-left: 6px solid rgba(43,31,26,0.25); }
+.todoRow{ border-left: 8px solid rgba(43,31,26,0.25); }
 .todoRow.priority-low{ border-left-color: var(--p-low); }
 .todoRow.priority-medium{ border-left-color: var(--p-med); }
 .todoRow.priority-high{ border-left-color: var(--p-high); }
